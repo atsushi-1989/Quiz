@@ -9,7 +9,7 @@ open class QuestionModel:RealmObject() {
     //id:0
     var id : String = ""
     //級:1
-    var grandeId: String = ""
+    var gradeId: String = ""
     //問題:2
     var question: String = ""
     //こたえ:3

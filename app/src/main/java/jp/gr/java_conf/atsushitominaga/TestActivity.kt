@@ -13,7 +13,7 @@ class TestActivity : AppCompatActivity() {
         setContentView(R.layout.activity_test)
 
 
-        fab.setOnClickListener { view ->
+        fab_sound_test.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }

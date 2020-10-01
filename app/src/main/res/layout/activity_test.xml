@@ -15,7 +15,7 @@
         android:layout_gravity="bottom|center" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_sound"
+        android:id="@+id/fab_sound_test"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
