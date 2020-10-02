@@ -6,6 +6,7 @@ import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.SoundPool
 import android.os.Build
+import com.google.android.gms.ads.MobileAds
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
@@ -17,6 +18,8 @@ class MyApplication : Application() {
         setRealm()
         setSoundPool()
         loadStatus()
+
+        MobileAds.initialize(this, getString(R.string.application_id_admob))
 
     }
 

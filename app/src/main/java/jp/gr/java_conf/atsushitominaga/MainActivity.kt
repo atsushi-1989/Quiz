@@ -1,11 +1,15 @@
 package jp.gr.java_conf.atsushitominaga
 
+import android.content.Intent
 import android.content.res.AssetManager
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
 import com.opencsv.CSVParserBuilder
 import com.opencsv.CSVReader
 import com.opencsv.CSVReaderBuilder
@@ -20,6 +24,8 @@ import java.io.InputStreamReader
 
 class MainActivity : AppCompatActivity() {
 
+    lateinit var interstitialAd: InterstitialAd
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -30,13 +36,64 @@ class MainActivity : AppCompatActivity() {
 
         importQuestionsFromCSV()
 
+        setBannerAd()
+        setInterstitialAd()
 
+        btnGrade1.setOnClickListener {
+            interstitialAd.show()
+        }
+
+        btnGrade2.setOnClickListener {
+            interstitialAd.show()
+            val intent = Intent(this@MainActivity,TestActivity::class.java)
+            startActivity(intent)
+        }
+
+
+    }
+
+    private fun setInterstitialAd() {
+        interstitialAd = InterstitialAd(this)
+        interstitialAd.adUnitId = getString(R.string.interstitial_ad_unit_id)
+        loadInterstitialAd()
+        interstitialAd.adListener = object : AdListener() {
+            override fun onAdClosed() {
+               loadInterstitialAd()
+
+                //Todo TestActivityに行く処理
+            }
+
+        }
+    }
+
+    private fun loadInterstitialAd() {
+        val adRequest = AdRequest.Builder().build()
+        interstitialAd.loadAd(adRequest)
+    }
+
+    private fun setBannerAd() {
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
     }
 
     override fun onResume() {
         super.onResume()
 
         updateUi()
+        adView?.resume()
+        if(!interstitialAd.isLoaded) loadInterstitialAd()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        adView?.pause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        adView?.destroy()
     }
 
     private fun updateUi() {
@@ -108,7 +165,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setCSVReader(): CSVReader {
         val assetManager: AssetManager = resources.assets
-        val inputStream = assetManager.open("Quetions.csv")
+        val inputStream = assetManager.open("Questions.csv")
         val parser = CSVParserBuilder().withSeparator(',').build()
         return CSVReaderBuilder(InputStreamReader(inputStream)).withCSVParser(parser).build()
 
