@@ -7,6 +7,7 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
@@ -22,9 +23,10 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AlertDialogFragment.AlertDialogListener {
 
     lateinit var interstitialAd: InterstitialAd
+    var gradeOfTest: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,15 +42,33 @@ class MainActivity : AppCompatActivity() {
         setInterstitialAd()
 
         btnGrade1.setOnClickListener {
-            interstitialAd.show()
+            if (isPaidGrade1){
+                gradeOfTest = 1
+                goTest(gradeOfTest)
+                return@setOnClickListener
+            }
+            purchaseGrade1()
         }
+
 
         btnGrade2.setOnClickListener {
-            interstitialAd.show()
-            val intent = Intent(this@MainActivity,TestActivity::class.java)
-            startActivity(intent)
+            gradeOfTest = 2
+            goTest(gradeOfTest)
         }
 
+
+    }
+
+    private fun purchaseGrade1() {
+        //Todo 1級購入処理(アプリ内課金)
+    }
+
+    private fun goTest(gradeOfTest: Int) {
+        if(!isDataSetFinished) return makeToast(this@MainActivity,getString(R.string.import_fail_notice))
+        if (!interstitialAd.isLoaded) return makeToast(this@MainActivity,getString(R.string.import_fail_notice))
+
+        val dialog = AlertDialogFragment()
+        dialog.show(supportFragmentManager, "GoTestAlert")
 
     }
 
@@ -59,11 +79,20 @@ class MainActivity : AppCompatActivity() {
         interstitialAd.adListener = object : AdListener() {
             override fun onAdClosed() {
                loadInterstitialAd()
+                // TestActivityに行く処理
+                goTestActivity(gradeOfTest)
 
-                //Todo TestActivityに行く処理
             }
 
         }
+    }
+
+    private fun goTestActivity(gradeOfTest: Int) {
+        val intent = Intent(this@MainActivity,TestActivity::class.java).apply {
+            putExtra(IntentKey.GRADE_OF_TEST.name, gradeOfTest)
+        }
+        startActivity(intent)
+
     }
 
     private fun loadInterstitialAd() {
@@ -169,6 +198,17 @@ class MainActivity : AppCompatActivity() {
         val parser = CSVParserBuilder().withSeparator(',').build()
         return CSVReaderBuilder(InputStreamReader(inputStream)).withCSVParser(parser).build()
 
+    }
+
+
+    //AlertDialogFragment.AlertDialogListener
+    override fun onPositiveButtonClicked() {
+        interstitialAd.show()
+    }
+
+    //AlertDialogFragment.AlertDialogListener
+    override fun onNegativeButtonClicked() {
+        makeToast(this@MainActivity,getString(R.string.press_cancel))
     }
 
 

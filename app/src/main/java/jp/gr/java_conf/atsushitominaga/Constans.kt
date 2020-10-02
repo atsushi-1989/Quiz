@@ -24,4 +24,23 @@ var isSoundOn = false
 
 var isDataSetFinished = false   //CSVデータが取れたかどうか
 
+enum class IntentKey{
+    GRADE_OF_TEST,
+    ANSWER,
+    EXPLANATION,
+    GRADE_FINISH,
+    TEST_STATUS
+}
+
+val INITIAL_NUMBER_OF_QUESTION = 10
+val INITIAL_LIFE = 3
+
+enum class TestStatus{
+    RUNNING,
+    FINISH_WIN,
+    FINISH_LOSE
+}
+
+
+
 
